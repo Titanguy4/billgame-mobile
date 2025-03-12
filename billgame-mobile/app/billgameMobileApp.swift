@@ -8,10 +8,10 @@
 import SwiftUI
 
 @main
-struct billgame_mobileApp: App {
+struct billgameMobileApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
         }
     }
 }
