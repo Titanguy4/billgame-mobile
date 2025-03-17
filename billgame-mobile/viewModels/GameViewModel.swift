@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 class GameViewModel: ObservableObject {
     @Published var games: [GameWithStock] = []
     private var service: GameService
@@ -10,14 +11,13 @@ class GameViewModel: ObservableObject {
             await loadGames()
         }
     }
-
+    
     func loadGames() async {
         guard let games = await service.getAvailableStock() else {
             self.games = []
             return
         }
         self.games = games
-        print(games[0].name)
     }
 
     func switchEditMode(game: GameWithStock) {
