@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct HomeSessionView: View {
+    @State var minPrice:Int? = nil
+    @State var maxPrice: Int? = nil
+    @State var gameName = ""
+    @State var editorName = ""
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -35,19 +40,34 @@ struct HomeSessionView: View {
                     
                     Spacer().frame(height: 50)
                     
-                    ScrollView {
-                        VStack(spacing: 75) {
-                            VStack(spacing: 15) {
-                                Text("Super ! Un festival est ouvert.")
-                                    .font(.headline)
-                                    .bold()
-                                    .multilineTextAlignment(.center)
-                                
-                                Text("Viens vite voir les jeux de sociétés que les commerçants de ton festivals te proposent au ")
-                                    .multilineTextAlignment(.leading)
-                            }
+                    VStack(spacing: 75) {
+                        VStack(spacing: 15) {
+                            Text("Super ! Un festival est ouvert.")
+                                .font(.headline)
+                                .bold()
+                                .multilineTextAlignment(.center)
+                            
+                            Text("Viens vite voir les jeux de sociétés que les commerçants de ton festivals te proposent au ")
+                                .multilineTextAlignment(.leading)
                         }
                     }
+                    
+                    Spacer().frame(height: 50)
+                    
+                    HStack(spacing: 20) {
+                                VStack(alignment: .leading) {
+                                    Text("Rechercher un jeu")
+                                        .font(.system(size: 15))
+                                        .bold()
+                                    TextField("Tapez le nom du jeu...", text: $gameName)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                }
+                            }
+                            .padding()
+                    
+                    Spacer().frame(height: 20)
+                    
+                    GameListView()
                 }
                 .padding(20)
             }
