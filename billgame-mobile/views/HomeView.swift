@@ -1,21 +1,14 @@
-//
-//  ContentView.swift
-//  billgame-mobile
-//
-//  Created by Hugo Tanguy on 12/03/2025.
-//
-
 import SwiftUI
 
 struct HomeView: View {
+    @StateObject var sessionVM = SessionViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if sessionVM.currentSession != nil {
+            HomeSessionView()
+        }else{
+            HomeNonSessionView()
         }
-        .padding()
     }
 }
 
