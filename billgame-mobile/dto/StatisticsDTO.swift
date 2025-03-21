@@ -4,8 +4,8 @@ struct StatisticsDTO: Codable {
     let depositFeeCollected: Double
     let commissionFeeCollected: Double
     let amountWithdrawn: Double
-    let numberOfSell: Int
-    let numberOfDeposit: Int
-    let numberOfNotSoldGames: Int
-    let numberOfWithrawnGames: Int
+    let numberOfSell: Int?
+    let numberOfDeposit: Int?
+    let numberOfNotSoldGames: Int?
+    let numberOfWithrawnGames: Int?
 }

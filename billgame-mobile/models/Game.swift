@@ -1,4 +1,4 @@
-class Game {
+class Game: Identifiable {
 
     private var _etiquette: String
     private var _name: String

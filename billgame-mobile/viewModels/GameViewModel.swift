@@ -2,25 +2,21 @@ import Foundation
 
 @MainActor
 class GameViewModel: ObservableObject {
-    @Published var games: [GameWithStock] = []
-    private var service: GameService
-
-    init(service: GameService){
-        self.service = service
+    @Published var allGames: [GameWithStock] = []
+    
+    private var service: GameService = GameService()
+    
+    init(){
         Task{
-            await loadGames()
+            await loadAllGames()
         }
     }
     
-    func loadGames() async {
+    func loadAllGames() async {
         guard let games = await service.getAvailableStock() else {
-            self.games = []
+            self.allGames = []
             return
         }
-        self.games = games
-    }
-
-    func switchEditMode(game: GameWithStock) {
-        print("Edit mode activé pour le jeu: \(game.name)")
+        self.allGames = games
     }
 }

@@ -1,8 +1,7 @@
 import SwiftUI
 
-struct GameListView: View {
-    let games: [Game]
-    var onRemoveGame: (Game) -> Void  // Closure pour supprimer un jeu
+struct GameWithStockListView: View {
+    @ObservedObject private var gameViewModel: GameViewModel = GameViewModel()
 
     private let columns = [
         GridItem(.flexible(), spacing: 10),
@@ -12,8 +11,8 @@ struct GameListView: View {
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 20) {
-                ForEach(games) { game in
-                    GameItemView(game: game)
+                ForEach(gameViewModel.allGames) { game in
+                    GameWithStockItemView(game: game)
                         .frame(maxWidth: .infinity)
                         .padding(8)
                         .background(Color.white)
@@ -22,13 +21,6 @@ struct GameListView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.gray, lineWidth: 0.5)
                         )
-                        .contextMenu {
-                            Button(role: .destructive) {
-                                onRemoveGame(game)
-                            } label: {
-                                Label("Supprimer", systemImage: "trash")
-                            }
-                        }
                 }
             }
             .padding(.horizontal, 10)

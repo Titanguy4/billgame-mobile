@@ -9,6 +9,7 @@ struct ManagerView: View {
                 StockView().tabItem{ Image(systemName: "archivebox"); Text("Stock")}
                 StatsView().tabItem{ Image(systemName: "chart.bar"); Text("Stats")}
             }
+            .tint(.black)
             
             Image("manager")
                 .resizable()

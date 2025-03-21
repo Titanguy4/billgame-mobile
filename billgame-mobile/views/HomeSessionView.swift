@@ -67,7 +67,7 @@ struct HomeSessionView: View {
                     
                     Spacer().frame(height: 20)
                     
-                    GameListView()
+                    GameWithStockListView()
                 }
                 .padding(20)
             }
