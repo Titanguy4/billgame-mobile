@@ -3,7 +3,8 @@ import SwiftUI
 struct DepotView: View {
     @StateObject var depotViewModel: DepotViewModel = DepotViewModel()
     @State private var navigateToDepot = false
-    
+    @State private var showRegisterSheet = false
+
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
@@ -55,10 +56,23 @@ struct DepotView: View {
                 }
                 .disabled(!depotViewModel.isEmailValid || depotViewModel.isLoading)
                 .padding(.horizontal)
+
+                Button(action: {
+                    showRegisterSheet = true
+                }) {
+                    Text("Créer un vendeur")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .underline()
+                }
+                .padding(.top, 10)
                 
                 Spacer()
             }
             .padding()
+            .sheet(isPresented: $showRegisterSheet) {
+                RegisterSellerView(viewModel: depotViewModel)
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ class LoginViewModel: ObservableObject {
                 guard let self = self else { return }
                 if success {
                     self.errorMessage = nil
-                    self.objectWillChange.send() // ✅ Force la mise à jour de l'UI
+                    self.objectWillChange.send()
                 } else {
                     self.errorMessage = errorMessage
                 }

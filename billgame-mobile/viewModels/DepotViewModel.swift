@@ -21,6 +21,10 @@ class DepotViewModel: ObservableObject {
     @Published var merchantUUID: String?
     @Published var depotState: DepotState = .idle
     @Published var selectedEditor: String = ""
+    @Published var sellerName: String = ""
+    @Published var sellerPhone: String = ""
+    @Published var sellerPassword: String = ""
+    @Published var sellerDiscount: String = "0"
 
     private let userService: UserService
     private let stockService: StockService
@@ -31,6 +35,39 @@ class DepotViewModel: ObservableObject {
         self.stockService = stockService
         self.gameService = gameService
     }
+    
+    func createSeller() {
+        guard isEmailValid else {
+            errorMessage = "Veuillez entrer un email valide."
+            return
+        }
+
+        let newSeller = SellerDTO(
+            uuid: UUID().uuidString,
+            name: sellerName,
+            email: email,
+            phone: sellerPhone,
+            roles: ["MERCHANT"],
+            password: sellerPassword,
+            discount: Double(sellerDiscount) ?? 0.0
+        )
+
+        isLoading = true
+        userService.createSeller(sellerDTO: newSeller) { result in
+            DispatchQueue.main.async {
+                self.isLoading = false
+                switch result {
+                case .success:
+                    self.errorMessage = nil
+                    self.depotState = .success("Vendeur créé avec succès !")
+                case .failure:
+                    self.errorMessage = "Erreur lors de la création du vendeur"
+                }
+            }
+        }
+    }
+
+
     
     func fetchEditor(for gameName: String) {
         gameService.getEditorByGame(gameName: gameName) { editorDTO in
