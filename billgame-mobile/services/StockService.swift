@@ -1,119 +1,124 @@
 import Foundation
 
-enum StockError: Error {
-    case invalidURL
-    case missingToken
-    case httpError(statusCode: Int)
-    case decodingError
-    case unknownError(Error)
-}
-
 class StockService {
     private let baseUrl = "https://billgameback.mathiaspuyfages.fr/stock"
-    private let authTokenStore = AuthTokenStore()
-    
-    init() {}
-    
-    func findGameByEtiquette(etiquette: String) async throws -> SingleStockDTO {
-        let urlString = "\(baseUrl)/\(etiquette)?active=true"
-        guard let url = URL(string: urlString) else {
-            throw StockError.invalidURL
+    private let httpService: HttpService = HttpService()
+
+    func findGameByEtiquette(etiquette: String, completion: @escaping (Result<SingleStockDTO, ErrorApi>) -> Void) {
+        guard let url = URL(string: "\(baseUrl)/\(etiquette)?active=true") else {
+            completion(.failure(.invalidURL))
+            return
         }
-        
-        guard let token = authTokenStore.token else {
-            throw StockError.missingToken
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw StockError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+
+        httpService.get(url: url, success: { data, _ in
+            do {
+                let game = try JSONDecoder().decode(SingleStockDTO.self, from: data)
+                completion(.success(game))
+            } catch {
+                completion(.failure(.decodingError))
             }
-            return try JSONDecoder().decode(SingleStockDTO.self, from: data)
+        }, failure: { error in
+            completion(.failure(.unknownError(error)))
+        })
+    }
+
+    func postDeposit(deposit: DepositDTO, publish: Bool, completion: @escaping (Result<Double, ErrorApi>) -> Void) {
+        
+        guard let url = URL(string: "\(baseUrl)/deposit?publish=\(publish)") else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        do {
+            let body = try JSONEncoder().encode(deposit)
+            httpService.post(url: url, body: body, success: { data, _ in
+                do {
+                    let response = try JSONDecoder().decode(Double.self, from: data)
+                    completion(.success(response))
+                } catch {
+                    print("Erreur de décodage:", error)
+                    print("Données reçues:", String(data: data, encoding: .utf8) ?? "Aucune donnée")
+                    completion(.failure(.decodingError))
+                }
+            }, failure: { error in
+                print("Erreur HTTP:", error)
+                completion(.failure(.unknownError(error)))
+            })
+
         } catch {
-            throw StockError.unknownError(error)
+            completion(.failure(.decodingError))
+        }
+    }
+
+    func getAvailableStock(completion: @escaping (Result<[StockDTO], ErrorApi>) -> Void) {
+        guard let url = URL(string: baseUrl) else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        httpService.get(url: url, success: { data, _ in
+            do {
+                let stockList = try JSONDecoder().decode([StockDTO].self, from: data)
+                completion(.success(stockList))
+            } catch {
+                completion(.failure(.decodingError))
+            }
+        }, failure: { error in
+            completion(.failure(.unknownError(error)))
+        })
+    }
+
+    func withdrawGames(listOfGamesToWithdraw: WithdrawGamesDTO, completion: @escaping (Result<Void, ErrorApi>) -> Void) {
+        guard let url = URL(string: "\(baseUrl)/withdraw") else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        do {
+            let body = try JSONEncoder().encode(listOfGamesToWithdraw)
+            httpService.post(url: url, body: body, success: { _, _ in
+                completion(.success(()))
+            }, failure: { error in
+                completion(.failure(.unknownError(error)))
+            })
+        } catch {
+            completion(.failure(.decodingError))
         }
     }
     
-    func postDeposit(deposit: DepositDTO, publish: Bool) async throws -> Int {
-        let urlString = "\(baseUrl)/deposit?publish=\(publish)"
-        guard let url = URL(string: urlString) else {
-            throw StockError.invalidURL
-        }
-        
-        guard let token = authTokenStore.token else {
-            throw StockError.missingToken
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        do {
-            request.httpBody = try JSONEncoder().encode(deposit)
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw StockError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+    func getAvailableStockForSeller(sellerUuid: String, completion: @escaping (Result<[SingleStockDTO], ErrorApi>) -> Void) {
+            guard let url = URL(string: "\(baseUrl)/current-session/\(sellerUuid)/active/on-sale") else {
+                completion(.failure(.invalidURL))
+                return
             }
-            return try JSONDecoder().decode(Int.self, from: data)
-        } catch {
-            throw StockError.unknownError(error)
+
+            httpService.get(url: url, success: { data, _ in
+                do {
+                    let stockList = try JSONDecoder().decode([SingleStockDTO].self, from: data)
+                    completion(.success(stockList))
+                } catch {
+                    completion(.failure(.decodingError))
+                }
+            }, failure: { error in
+                completion(.failure(.unknownError(error)))
+            })
         }
-    }
-    
-    func getAvailableStock() async throws -> [StockDTO] {
-        let urlString = "\(baseUrl)"
-        guard let url = URL(string: urlString) else {
-            throw StockError.invalidURL
-        }
-        
-        guard let token = authTokenStore.token else {
-            throw StockError.missingToken
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw StockError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
+
+        func getSoldGamesForSeller(sellerUuid: String, completion: @escaping (Result<[SingleStockDTO], ErrorApi>) -> Void) {
+            guard let url = URL(string: "\(baseUrl)/current-session/\(sellerUuid)/active/sold") else {
+                completion(.failure(.invalidURL))
+                return
             }
-            return try JSONDecoder().decode([StockDTO].self, from: data)
-        } catch {
-            throw StockError.unknownError(error)
+
+            httpService.get(url: url, success: { data, _ in
+                do {
+                    let soldGames = try JSONDecoder().decode([SingleStockDTO].self, from: data)
+                    completion(.success(soldGames))
+                } catch {
+                    completion(.failure(.decodingError))
+                }
+            }, failure: { error in
+                completion(.failure(.unknownError(error)))
+            })
         }
-    }
-    
-    func withdrawGames(listOfGamesToWithdraw: WithdrawGamesDTO) async throws {
-        let urlString = "\(baseUrl)/withdraw"
-        guard let url = URL(string: urlString) else {
-            throw StockError.invalidURL
-        }
-        
-        guard let token = authTokenStore.token else {
-            throw StockError.missingToken
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        do {
-            request.httpBody = try JSONEncoder().encode(listOfGamesToWithdraw)
-            let (_, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw StockError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
-            }
-        } catch {
-            throw StockError.unknownError(error)
-        }
-    }
 }

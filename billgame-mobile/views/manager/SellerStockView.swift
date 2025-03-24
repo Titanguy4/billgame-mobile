@@ -1,26 +1,9 @@
 import SwiftUI
 
-struct Jeu: Identifiable {
-    let id = UUID()
-    let nom: String
-    let editeur: String
-    let prix: Int
-    let etiquette: String
-}
-
-import SwiftUI
-
 struct SellerStockView: View {
-    var email: String
-    
-    let jeuxEnVente: [Jeu] = [
-        Jeu(nom: "Dragon’s Quest", editeur: "Fantasy Games", prix: 30, etiquette: "c6cc57a8-beab-4c44-aed3-82bb02b0cfac"),
-        Jeu(nom: "Dragon’s Quest", editeur: "Fantasy Games", prix: 30, etiquette: "15da6ae9-d346-4917-86a7-2089ddbe665d")
-    ]
-
-    let jeuxVendus: [Jeu] = [
-        Jeu(nom: "Dragon’s Quest", editeur: "Fantasy Games", prix: 30, etiquette: "86097553-6346-419d-b98b-de608ef1a670")
-    ]
+    @ObservedObject var viewModel: StockViewModel
+    @State private var showWithdrawSheet = false
+    @State private var showWithdrawGamesSheet = false
 
     var body: some View {
         ScrollView {
@@ -29,23 +12,60 @@ struct SellerStockView: View {
                     .font(.largeTitle)
                     .bold()
 
-                Text(email)
+                Text(viewModel.email)
                     .font(.headline)
                     .foregroundColor(.gray)
 
+                if let messageError = viewModel.messageError {
+                    Text(messageError)
+                        .foregroundColor(.red)
+                        .font(.body)
+                        .padding()
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(8)
+                }
+                
+                VStack(spacing: 10){
+                    HStack(spacing: 10) {
+                        StatCard(title: "Jeux en vente", value: "\(viewModel.availableGames.count)")
+                        StatCard(title: "Jeux vendus", value: "\(viewModel.soldGames.count)")
+                    }
+                    HStack(spacing: 10) {
+                        StatCard(title: "Somme due", value: viewModel.moneyDue != nil ? "\(viewModel.moneyDue!)€" : "N/A")
+                    }
+                }
+                
+
                 HStack(spacing: 10) {
-                    StatCard(title: "Jeux en vente", value: "\(jeuxEnVente.count)")
-                    StatCard(title: "Jeux vendus", value: "\(jeuxVendus.count)")
+                    Button(action: { showWithdrawGamesSheet = true }) {
+                        Image(systemName: "shippingbox.and.arrow.backward")
+                            .frame(width: 40, height: 40)
+                            .background(Color.black)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    Button(action: { showWithdrawSheet = true }) {
+                        Image(systemName: "creditcard")
+                            .frame(width: 40, height: 40)
+                            .background(Color.black)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
                 }
 
-                SectionView(title: "Jeux en vente", jeux: jeuxEnVente)
-                SectionView(title: "Jeux vendus", jeux: jeuxVendus)
+                SectionView(title: "Jeux en vente", jeux: viewModel.availableGames)
+                SectionView(title: "Jeux vendus", jeux: viewModel.soldGames)
 
                 Spacer()
             }
             .padding()
         }
         .navigationBarTitle("Stock", displayMode: .inline)
+        .sheet(isPresented: $showWithdrawSheet) {
+            WithdrawSheetView(isPresented: $showWithdrawSheet, viewModel: viewModel)
+        }
+        .sheet(isPresented: $showWithdrawGamesSheet) {
+            WithdrawGamesSheetView(isPresented: $showWithdrawGamesSheet, viewModel: viewModel)
+        }
     }
 }
-

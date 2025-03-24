@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SectionView: View {
     var title: String
-    var jeux: [Jeu]
+    var jeux: [Game]
     
     @State private var isExpanded = false
 
@@ -29,7 +29,7 @@ struct SectionView: View {
 
             if isExpanded {
                 ForEach(jeux) { jeu in
-                    JeuRow(jeu: jeu) // Composant séparé pour un meilleur style
+                    JeuRow(jeu: jeu)
                 }
             }
         }
@@ -38,16 +38,16 @@ struct SectionView: View {
 }
 
 struct JeuRow: View {
-    var jeu: Jeu
-    @State private var isCopied = false // État pour montrer l'animation de copie
+    var jeu: Game
+    @State private var isCopied = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("\(jeu.nom) - \(jeu.editeur)")
+            Text("\(jeu.name) - \(jeu.editor)")
                 .font(.headline)
             
             HStack {
-                Text("Prix: \(jeu.prix) €")
+                Text("Prix: \(jeu.price, specifier: "%.2f") €")
                     .font(.subheadline)
                     .foregroundColor(.gray)
 

@@ -17,7 +17,7 @@ class StatsViewModel: ObservableObject {
         errorMessage = nil
         do {
             statistics = try await transactionService.getCurrentSessionStatistics()
-        } catch let error as TransactionError {
+        } catch let error as ErrorApi {
             switch error {
             case .invalidURL:
                 errorMessage = "❌ URL invalide. Vérifiez l'adresse de l'API."

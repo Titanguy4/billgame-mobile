@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct DepotView: View {
-    @StateObject private var viewModel = DepotViewModel()
-
+    @StateObject var depotViewModel: DepotViewModel = DepotViewModel()
+    @State private var navigateToDepot = false
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
@@ -11,50 +12,50 @@ struct DepotView: View {
                     .bold()
                     .foregroundColor(.black)
                     .padding(.top, 40)
-
-                Text("Entrez l'email du vendeur pour déposer un ou plusieurs jeux")
+                
+                Text("Entrez l'email du vendeur pour voir déposer un ou plusieurs jeux")
                     .font(.headline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
-
-                TextField("Email du vendeur", text: $viewModel.email)
+                
+                TextField("Email du vendeur", text: $depotViewModel.email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
-                    .onChange(of: viewModel.email) { _ in
-                        viewModel.validateEmail()
-                    }
-
-                if let errorMessage = viewModel.errorMessage {
+                
+                if let errorMessage = depotViewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
                         .font(.footnote)
                         .padding(.horizontal)
                 }
-
-                NavigationLink(
-                    destination: DepotFormView(email: viewModel.email),
-                    isActive: $viewModel.isEmailVerified
-                ) {
+                
+                NavigationLink(destination: DepotFormView(viewModel: depotViewModel), isActive: $navigateToDepot) {
                     EmptyView()
                 }
 
+                .onReceive(depotViewModel.$isEmailVerified) { isVerified in
+                    if isVerified {
+                        navigateToDepot = true
+                    }
+                }
+                
                 Button(action: {
-                    viewModel.validateEmail()
+                        depotViewModel.checkMerchantEmail()
                 }) {
                     Text("Valider")
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(viewModel.isEmailValid ? Color.black : Color.gray)
+                        .background(depotViewModel.isEmailValid ? Color.black : Color.gray)
                         .cornerRadius(10)
                 }
-                .disabled(!viewModel.isEmailValid)
+                .disabled(!depotViewModel.isEmailValid || depotViewModel.isLoading)
                 .padding(.horizontal)
-
+                
                 Spacer()
             }
             .padding()

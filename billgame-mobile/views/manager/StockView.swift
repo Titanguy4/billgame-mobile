@@ -1,63 +1,60 @@
 import SwiftUI
 
 struct StockView: View {
-    @State private var email: String = "diane.dubois@example.com"
-    @State private var isEmailValid: Bool = false
-    @State private var navigateToStock = false
-
+    @StateObject private var viewModel = StockViewModel()
+    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Text("Accéder au stock")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.black)
                     .padding(.top, 40)
-
+                
                 Text("Entrez l'email du vendeur pour voir son stock")
                     .font(.headline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
-
-                TextField("Email du vendeur", text: $email)
+                
+                TextField("Email du vendeur", text: $viewModel.email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
-                    .onChange(of: email) { newValue in
-                        isEmailValid = isValidEmail(newValue)
+                    .onChange(of: viewModel.email) {
+                        viewModel.validateEmail()
                     }
-
-                NavigationLink(destination: SellerStockView(email: email), isActive: $navigateToStock) {
-                    EmptyView()
+                
+                if let messageError = viewModel.messageError {
+                    Text(messageError)
+                        .foregroundColor(.red)
+                        .font(.footnote)
+                        .padding(.horizontal)
+                        .multilineTextAlignment(.center)
                 }
-
+                
                 Button(action: {
-                    if isEmailValid {
-                        navigateToStock = true
-                    }
+                    viewModel.validateEmail()
                 }) {
                     Text("Valider")
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(isEmailValid ? Color.black : Color.gray)
+                        .background(viewModel.isEmailValid ? Color.black : Color.gray)
                         .cornerRadius(10)
                 }
-                .disabled(!isEmailValid)
+                .disabled(!viewModel.isEmailValid)
                 .padding(.horizontal)
-
+                
                 Spacer()
             }
             .padding()
+            .navigationDestination(isPresented: $viewModel.isEmailVerified) {
+                SellerStockView(viewModel: viewModel)
+            }
         }
-    }
-
-    // Vérification de l'email
-    private func isValidEmail(_ email: String) -> Bool {
-        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
-        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
     }
 }

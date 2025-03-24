@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct LoginView: View {
-    @StateObject var viewModel = LoginViewModel()
+    @EnvironmentObject var viewModel: LoginViewModel
+    @State private var navigateToManager = false // ✅ Variable d'état locale pour la navigation
 
     var body: some View {
         NavigationStack {
@@ -37,7 +38,9 @@ struct LoginView: View {
                                 .font(.footnote)
                         }
 
-                        Button(action: viewModel.login) {
+                        Button(action: {
+                            viewModel.login()
+                        }) {
                             Text("Se connecter")
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -62,14 +65,12 @@ struct LoginView: View {
                 }
                 .padding(.horizontal, 20)
             }
-            .navigationDestination(isPresented: $viewModel.isAuthenticated) {
+            .onReceive(viewModel.objectWillChange) { // ✅ Écoute les changements de `isAuthenticated`
+                navigateToManager = viewModel.isAuthenticated
+            }
+            .navigationDestination(isPresented: $navigateToManager) {
                 ManagerView()
             }
         }
     }
 }
-
-#Preview {
-    LoginView()
-}
-

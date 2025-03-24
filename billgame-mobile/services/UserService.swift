@@ -11,8 +11,30 @@ enum UserError: Error {
 class UserService {
     private let baseUrl = "https://billgameback.mathiaspuyfages.fr/user"
     private let authTokenStore = AuthTokenStore()
+    private let httpService = HttpService()
     
     init() {}
+    
+    func getMerchantUUIDByEmail(email: String, completion: @escaping (Result<String, UserError>) -> Void) {
+        let urlString = "\(baseUrl)/seller/\(email)/uuid"
+        guard let url = URL(string: urlString) else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        httpService.get(url: url, success: { data, _ in
+            if var uuid = String(data: data, encoding: .utf8), !uuid.isEmpty {
+                uuid = uuid.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+                completion(.success(uuid))
+            } else {
+                completion(.failure(.decodingError))
+            }
+
+        }, failure: { error in
+            completion(.failure(.unknownError(error)))
+        })
+    }
+
     
     func getAllUsers() async throws -> [UserDTO] {
         let urlString = baseUrl
@@ -34,31 +56,6 @@ class UserService {
                 throw UserError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
             }
             return try JSONDecoder().decode([UserDTO].self, from: data)
-        } catch {
-            throw UserError.unknownError(error)
-        }
-    }
-    
-    func getMerchantUUIDByEmail(email: String) async throws -> String {
-        let urlString = "\(baseUrl)/seller/\(email)/uuid"
-        guard let url = URL(string: urlString) else {
-            throw UserError.invalidURL
-        }
-        
-        guard let token = authTokenStore.token else {
-            throw UserError.missingToken
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw UserError.httpError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0)
-            }
-            return try JSONDecoder().decode(String.self, from: data)
         } catch {
             throw UserError.unknownError(error)
         }
