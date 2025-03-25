@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct HomeNonSessionView: View {
+    @EnvironmentObject var viewModel: LoginViewModel
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -21,14 +23,48 @@ struct HomeNonSessionView: View {
                         
                         Spacer()
                         
-                        NavigationLink(destination: LoginView()) {
-                            Text("Se connecter")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white)
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 16)
-                                .background(Color.black)
-                                .cornerRadius(25)
+                        if viewModel.isAuthenticated {
+                            if viewModel.isAdmin {
+                                NavigationLink(destination: AdminView()) {
+                                    Text("Admin Dashboard")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black)
+                                        .cornerRadius(25)
+                                }
+                            } else if viewModel.isMerchant {
+                                NavigationLink(destination: ManagerView()) {
+                                    Text("Dashboard Vendeur")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black)
+                                        .cornerRadius(25)
+                                }
+                            } else {
+                                NavigationLink(destination: LoginView()) {
+                                    Text("Se connecter")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black)
+                                        .cornerRadius(25)
+                                }
+                            }
+                        } else {
+                            NavigationLink(destination: LoginView()) {
+                                Text("Se connecter")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, 16)
+                                    .background(Color.black)
+                                    .cornerRadius(25)
+                            }
                         }
                     }
                     .frame(height: 75)

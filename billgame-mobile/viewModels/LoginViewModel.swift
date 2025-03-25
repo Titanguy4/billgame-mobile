@@ -2,8 +2,8 @@ import SwiftUI
 import Combine
 
 class LoginViewModel: ObservableObject {
-    @Published var email: String = "diane.dubois@example.com"
-    @Published var password: String = "hashed_password_diane"
+    @Published var email: String = ""
+    @Published var password: String = ""
     @Published var errorMessage: String? = nil
     @Published var isAuthenticated: Bool = false
     @Published var roles: [String] = []

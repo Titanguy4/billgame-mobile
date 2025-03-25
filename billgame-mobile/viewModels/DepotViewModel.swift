@@ -131,6 +131,14 @@ class DepotViewModel: ObservableObject {
             }
         }
     }
+    
+    func removeGame(at index: Int) {
+        guard index >= 0 && index < gamesToDeposit.count else { return }
+        gamesToDeposit.remove(at: index)
+        depotState = .success("Jeu supprimé du dépôt.")
+    }
+
+
 
     func validateEmail() {
         isEmailValid = isValidEmail(email)

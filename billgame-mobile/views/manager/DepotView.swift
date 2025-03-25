@@ -6,7 +6,7 @@ struct DepotView: View {
     @State private var showRegisterSheet = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Text("Accéder au dépôt")
                     .font(.largeTitle)
@@ -32,12 +32,17 @@ struct DepotView: View {
                         .font(.footnote)
                         .padding(.horizontal)
                 }
-                
-                NavigationLink(destination: DepotFormView(viewModel: depotViewModel), isActive: $navigateToDepot) {
+
+                // Remplacer l'ancienne méthode de NavigationLink
+                NavigationLink(value: navigateToDepot) {
                     EmptyView()
                 }
-
-                .onReceive(depotViewModel.$isEmailVerified) { isVerified in
+                .navigationDestination(for: Bool.self) { isActive in
+                    if isActive {
+                        DepotFormView(viewModel: depotViewModel)
+                    }
+                }
+                .onChange(of: depotViewModel.isEmailVerified) { isVerified in
                     if isVerified {
                         navigateToDepot = true
                     }

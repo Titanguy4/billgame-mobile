@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct DepotFormView: View {
-    
+
     let gameList = [
         "Dragon’s Quest",
         "Puzzle Masters",
@@ -32,7 +32,8 @@ struct DepotFormView: View {
 
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                    ForEach(viewModel.gamesToDeposit, id: \.name) { game in
+                    ForEach(viewModel.gamesToDeposit.indices, id: \.self) { index in
+                        let game = viewModel.gamesToDeposit[index]
                         VStack(alignment: .leading) {
                             Text(game.name)
                                 .font(.headline)
@@ -52,6 +53,13 @@ struct DepotFormView: View {
                         .background(Color.white)
                         .cornerRadius(12)
                         .shadow(color: Color.black.opacity(0.1), radius: 5)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                viewModel.removeGame(at: index) // Appel à la méthode de suppression
+                            } label: {
+                                Label("Supprimer", systemImage: "trash")
+                            }
+                        }
                     }
                 }
                 .padding(.horizontal)

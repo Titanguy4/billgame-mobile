@@ -30,14 +30,37 @@ struct HomeSessionView: View {
                         Spacer()
 
                         if viewModel.isAuthenticated {
-                            NavigationLink(destination: ManagerView()) {
-                                Text("Dashboard")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.white)
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 16)
-                                    .background(Color.black)
-                                    .cornerRadius(25)
+                            // Redirige en fonction du rôle
+                            if viewModel.isAdmin {
+                                NavigationLink(destination: AdminView()) {
+                                    Text("Admin Dashboard")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black)
+                                        .cornerRadius(25)
+                                }
+                            } else if viewModel.isMerchant {
+                                NavigationLink(destination: ManagerView()) {
+                                    Text("Dashboard Vendeur")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black)
+                                        .cornerRadius(25)
+                                }
+                            } else {
+                                NavigationLink(destination: LoginView()) {
+                                    Text("Se connecter")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black)
+                                        .cornerRadius(25)
+                                }
                             }
                         } else {
                             NavigationLink(destination: LoginView()) {
