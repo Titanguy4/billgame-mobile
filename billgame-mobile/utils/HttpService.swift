@@ -19,6 +19,10 @@ class HttpService {
     func put(url: URL, body: Data?, success: @escaping (Data, [AnyHashable: Any]?) -> Void, failure: @escaping (Error) -> Void) {
         performRequest(url: url, httpMethod: "PUT", body: body, success: success, failure: failure)
     }
+    
+    func patch(url: URL, body: Data?, success: @escaping (Data, [AnyHashable: Any]?) -> Void, failure: @escaping (Error) -> Void) {
+       performRequest(url: url, httpMethod: "PATCH", body: body, success: success, failure: failure)
+   }
 
     func delete(url: URL, success: @escaping (Data, [AnyHashable: Any]?) -> Void, failure: @escaping (Error) -> Void) {
         performRequest(url: url, httpMethod: "DELETE", success: success, failure: failure)
@@ -36,7 +40,7 @@ class HttpService {
 
         let task = session.dataTask(with: request) { data, response, error in
             if let error = error {
-                failure(error) // Si la requête a échoué (ex: problème réseau)
+                failure(error)
                 return
             }
             

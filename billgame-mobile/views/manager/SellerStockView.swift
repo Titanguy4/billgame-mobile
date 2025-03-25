@@ -31,7 +31,7 @@ struct SellerStockView: View {
                         StatCard(title: "Jeux vendus", value: "\(viewModel.soldGames.count)")
                     }
                     HStack(spacing: 10) {
-                        StatCard(title: "Somme due", value: viewModel.moneyDue != nil ? "\(viewModel.moneyDue!)€" : "N/A")
+                        StatCard(title: "Somme due", value: viewModel.moneyDue != nil ? String(format: "%.2f€", viewModel.moneyDue!) : "N/A")
                     }
                 }
                 

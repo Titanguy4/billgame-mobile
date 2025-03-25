@@ -1,3 +1,4 @@
+/// `StatisticsDTO` est une structure de transfert de données (DTO) utilisée pour représenter diverses statistiques financières et opérationnelles.
 struct StatisticsDTO: Codable {
     let tresorerieTotal: Double
     let dueToVendor: Double

@@ -1,23 +1,23 @@
 import Foundation
 
-class SessionViewModel : ObservableObject{
-    @Published var currentSession : Session?
+@MainActor
+class SessionViewModel: ObservableObject {
+    @Published var currentSession: Session?
     
-    var sessionService : SessionService
+    var sessionService: SessionService
     
-    init () {
+    init() {
         sessionService = SessionService()
         Task {
             await self.getCurrentSession()
         }
     }
     
-    func getCurrentSession () async -> Void{
+    func getCurrentSession() async {
         guard let sessionDTO = await sessionService.fetchCurrentSession() else {
             currentSession = nil
             return
         }
-        
-        currentSession = Session(adresse: sessionDTO.adresse)
+        currentSession = Session(from: sessionDTO)
     }
 }

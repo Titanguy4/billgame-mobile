@@ -3,6 +3,7 @@ import Security
 import JWTDecode
 import SwiftUI
 
+/// `AuthJwtPayload` est une structure représentant la charge utile du JWT (JSON Web Token), qui contient des informations sur l'utilisateur et ses rôles.
 struct AuthJwtPayload: Codable {
     let roles: [String]
     let uuid: String
@@ -12,6 +13,8 @@ struct AuthJwtPayload: Codable {
     let iat: TimeInterval
 }
 
+/// `AuthService` est une classe responsable de la gestion de l'authentification de l'utilisateur.
+/// Elle interagit avec le serveur pour se connecter, gérer les tokens JWT et déterminer les rôles de l'utilisateur.
 class AuthService {
     
     private var role: [String] = []
@@ -21,6 +24,8 @@ class AuthService {
     var isAdmin: Bool = false
     var isMerchant: Bool = false
 
+    /// Configure les rôles de l'utilisateur à partir du JWT.
+    /// - Parameter jwt: Le JWT décodé qui contient les informations sur les rôles de l'utilisateur.
     private func setRole(from jwt: JWT) {
         if let roles = jwt.claim(name: "roles").array {
             self.role = roles
@@ -33,7 +38,6 @@ class AuthService {
         isMerchant = role.contains("Seller")
     }
 
-    
     var isBearerExpired: Bool {
         guard let token = authTokenStore.token, let jwt = try? decode(jwt: token) else { return true }
         return jwt.expired
@@ -44,16 +48,25 @@ class AuthService {
         authTokenStore.token = nil
     }
 
+    /// Récupère l'UUID de l'utilisateur à partir du JWT.
+    /// - Returns: L'UUID de l'utilisateur si disponible, sinon `nil`.
     func getUuid() -> String? {
         guard let token = authTokenStore.token, let jwt = try? decode(jwt: token) else { return nil }
         return jwt.claim(name: "uuid").string
     }
 
+    /// Récupère le nom de l'utilisateur à partir du JWT.
+    /// - Returns: Le nom de l'utilisateur si disponible, sinon `nil`.
     func getName() -> String? {
         guard let token = authTokenStore.token, let jwt = try? decode(jwt: token) else { return nil }
         return jwt.claim(name: "name").string
     }
 
+    /// Effectue une connexion en envoyant les identifiants à un serveur et en récupérant un token d'authentification.
+    /// - Parameters:
+    ///   - email: L'email de l'utilisateur.
+    ///   - password: Le mot de passe de l'utilisateur.
+    ///   - completion: Un callback qui indique si la connexion a réussi ou non, ainsi qu'un message.
     func login(email: String, password: String, completion: @escaping (Bool, String) -> Void) {
         guard let url = URL(string: "https://billgameback.mathiaspuyfages.fr/auth/login") else { return }
         
@@ -81,7 +94,6 @@ class AuthService {
                         }
                         completion(true, "Succès de la connexion")
                     }
-                    
                 }
             } else {
                 completion(false, "Erreur de connexion, vérifier vos identifiants")

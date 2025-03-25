@@ -7,6 +7,9 @@ struct HomeSessionView: View {
     @State var gameName = ""
     @State var editorName = ""
 
+    // Instancier GameViewModel
+    @StateObject var gameViewModel = GameViewModel()
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -79,7 +82,14 @@ struct HomeSessionView: View {
 
                     Spacer().frame(height: 20)
 
-                    GameWithStockListView()
+                    // Passer gameViewModel à GameWithStockListView
+                    GameWithStockListView(gameViewModel: gameViewModel, searchQuery: $gameName)
+                        .onAppear {
+                            // Charger les jeux dès que la vue apparaît
+                            Task {
+                                await gameViewModel.loadAllGames()
+                            }
+                        }
                 }
                 .padding(20)
             }

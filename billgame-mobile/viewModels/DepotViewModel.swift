@@ -107,8 +107,6 @@ class DepotViewModel: ObservableObject {
             return
         }
         
-        print("UUID Seller avant DepositDTO: \(uuidSeller) (type: \(type(of: uuidSeller)))")
-        
         guard !gamesToDeposit.isEmpty else {
             depotState = .failure("Aucun jeu à déposer.")
             return
@@ -121,7 +119,6 @@ class DepotViewModel: ObservableObject {
             paymentMethod: "Cash",
             isPublished: true
         )
-        print(deposit)
         stockService.postDeposit(deposit: deposit, publish: true) { result in
             DispatchQueue.main.async {
                 switch result {
@@ -153,7 +150,6 @@ class DepotViewModel: ObservableObject {
         userService.getMerchantUUIDByEmail(email: email) { result in
             DispatchQueue.main.async {
                 self.isLoading = false
-                print(result)
                 
                 switch result {
                 case .success(let uuid):

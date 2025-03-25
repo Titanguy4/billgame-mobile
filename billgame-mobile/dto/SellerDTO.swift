@@ -1,3 +1,4 @@
+/// `SellerDTO` est une structure de transfert de données (DTO) utilisée pour représenter un vendeur.
 struct SellerDTO: Codable {
     let uuid: String
     let name: String

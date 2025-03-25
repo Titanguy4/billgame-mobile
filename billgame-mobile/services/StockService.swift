@@ -1,9 +1,14 @@
 import Foundation
 
+/// `StockService` gère la communication avec l'API pour effectuer des actions liées aux stocks de jeux.
 class StockService {
     private let baseUrl = "https://billgameback.mathiaspuyfages.fr/stock"
     private let httpService: HttpService = HttpService()
 
+    /// Recherche un jeu par son étiquette et renvoie un résultat.
+    /// - Parameters:
+    ///   - etiquette: L'étiquette du jeu à rechercher.
+    ///   - completion: Un callback qui renvoie un `Result` avec un objet `SingleStockDTO` ou une erreur.
     func findGameByEtiquette(etiquette: String, completion: @escaping (Result<SingleStockDTO, ErrorApi>) -> Void) {
         guard let url = URL(string: "\(baseUrl)/\(etiquette)?active=true") else {
             completion(.failure(.invalidURL))
@@ -22,6 +27,11 @@ class StockService {
         })
     }
 
+    /// Poste un dépôt de jeu, et renvoie le montant en retour.
+    /// - Parameters:
+    ///   - deposit: L'objet `DepositDTO` contenant les informations du dépôt.
+    ///   - publish: Un booléen qui indique si le dépôt doit être publié.
+    ///   - completion: Un callback qui renvoie un `Result` avec le montant du dépôt ou une erreur.
     func postDeposit(deposit: DepositDTO, publish: Bool, completion: @escaping (Result<Double, ErrorApi>) -> Void) {
         
         guard let url = URL(string: "\(baseUrl)/deposit?publish=\(publish)") else {
@@ -50,6 +60,8 @@ class StockService {
         }
     }
 
+    /// Récupère la liste des stocks disponibles.
+    /// - Parameter completion: Un callback qui renvoie un `Result` avec une liste d'objets `StockDTO` ou une erreur.
     func getAvailableStock(completion: @escaping (Result<[StockDTO], ErrorApi>) -> Void) {
         guard let url = URL(string: baseUrl) else {
             completion(.failure(.invalidURL))
@@ -68,6 +80,10 @@ class StockService {
         })
     }
 
+    /// Retire une liste de jeux du stock.
+    /// - Parameters:
+    ///   - listOfGamesToWithdraw: L'objet `WithdrawGamesDTO` contenant les jeux à retirer.
+    ///   - completion: Un callback qui renvoie un `Result` avec `Void` ou une erreur.
     func withdrawGames(listOfGamesToWithdraw: WithdrawGamesDTO, completion: @escaping (Result<Void, ErrorApi>) -> Void) {
         guard let url = URL(string: "\(baseUrl)/withdraw") else {
             completion(.failure(.invalidURL))
@@ -85,7 +101,11 @@ class StockService {
             completion(.failure(.decodingError))
         }
     }
-    
+
+    /// Récupère la liste des jeux disponibles pour un vendeur spécifique.
+    /// - Parameters:
+    ///   - sellerUuid: L'UUID du vendeur.
+    ///   - completion: Un callback qui renvoie un `Result` avec une liste de `SingleStockDTO` ou une erreur.
     func getAvailableStockForSeller(sellerUuid: String, completion: @escaping (Result<[SingleStockDTO], ErrorApi>) -> Void) {
             guard let url = URL(string: "\(baseUrl)/current-session/\(sellerUuid)/active/on-sale") else {
                 completion(.failure(.invalidURL))
@@ -104,7 +124,11 @@ class StockService {
             })
         }
 
-        func getSoldGamesForSeller(sellerUuid: String, completion: @escaping (Result<[SingleStockDTO], ErrorApi>) -> Void) {
+    /// Récupère la liste des jeux vendus par un vendeur spécifique.
+    /// - Parameters:
+    ///   - sellerUuid: L'UUID du vendeur.
+    ///   - completion: Un callback qui renvoie un `Result` avec une liste de `SingleStockDTO` ou une erreur.
+    func getSoldGamesForSeller(sellerUuid: String, completion: @escaping (Result<[SingleStockDTO], ErrorApi>) -> Void) {
             guard let url = URL(string: "\(baseUrl)/current-session/\(sellerUuid)/active/sold") else {
                 completion(.failure(.invalidURL))
                 return

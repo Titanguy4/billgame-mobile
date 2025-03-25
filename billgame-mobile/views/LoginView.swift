@@ -2,7 +2,8 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var viewModel: LoginViewModel
-    @State private var navigateToManager = false // ✅ Variable d'état locale pour la navigation
+    @State private var navigateToAdmin = false
+    @State private var navigateToManager = false
 
     var body: some View {
         NavigationStack {
@@ -65,8 +66,17 @@ struct LoginView: View {
                 }
                 .padding(.horizontal, 20)
             }
-            .onReceive(viewModel.objectWillChange) { // ✅ Écoute les changements de `isAuthenticated`
-                navigateToManager = viewModel.isAuthenticated
+            .onReceive(viewModel.objectWillChange) {
+                if viewModel.isAuthenticated {
+                    if viewModel.isAdmin {
+                        navigateToAdmin = true
+                    } else if viewModel.isMerchant {
+                        navigateToManager = true
+                    }
+                }
+            }
+            .navigationDestination(isPresented: $navigateToAdmin) {
+                AdminView()
             }
             .navigationDestination(isPresented: $navigateToManager) {
                 ManagerView()

@@ -5,13 +5,12 @@ class LoginViewModel: ObservableObject {
     @Published var email: String = "diane.dubois@example.com"
     @Published var password: String = "hashed_password_diane"
     @Published var errorMessage: String? = nil
-
+    @Published var isAuthenticated: Bool = false
+    @Published var roles: [String] = []
+    
     private let authService = AuthService()
-    private let authTokenStore = AuthTokenStore()
 
-    var isAuthenticated: Bool {
-        authTokenStore.token != nil // ✅ Vérifie si un token est stocké
-    }
+    init() {}
 
     func login() {
         guard !email.isEmpty, !password.isEmpty else {
@@ -19,14 +18,14 @@ class LoginViewModel: ObservableObject {
             return
         }
 
-        authService.login(email: email, password: password) { [weak self] success, errorMessage in
+        authService.login(email: email, password: password) { [weak self] success, message in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 if success {
+                    self.isAuthenticated = true
                     self.errorMessage = nil
-                    self.objectWillChange.send()
                 } else {
-                    self.errorMessage = errorMessage
+                    self.errorMessage = message
                 }
             }
         }
@@ -34,6 +33,19 @@ class LoginViewModel: ObservableObject {
     
     func logout() {
         authService.logout()
-        objectWillChange.send()
+        isAuthenticated = false
+        roles = []
+    }
+
+    var isAdmin: Bool {
+        self.authService.isAdmin
+    }
+    
+    var isManager: Bool {
+        self.authService.isManager
+    }
+    
+    var isMerchant: Bool {
+        self.authService.isMerchant
     }
 }

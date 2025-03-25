@@ -24,24 +24,6 @@ class UserService {
             completion(.failure(.unknownError(error)))
         })
     }
-
-    func getAllUsers(completion: @escaping (Result<[UserDTO], ErrorApi>) -> Void) {
-        guard let url = URL(string: baseUrl) else {
-            completion(.failure(.invalidURL))
-            return
-        }
-
-        httpService.get(url: url, success: { data, _ in
-            do {
-                let users = try JSONDecoder().decode([UserDTO].self, from: data)
-                completion(.success(users))
-            } catch {
-                completion(.failure(.decodingError))
-            }
-        }, failure: { error in
-            completion(.failure(.unknownError(error)))
-        })
-    }
     
     func createSeller(sellerDTO: SellerDTO, completion: @escaping (Result<Void, ErrorApi>) -> Void) {
         guard let url = URL(string: "\(baseUrl)/seller") else {
@@ -61,34 +43,50 @@ class UserService {
         }
     }
     
-    func editUser(userDTO: UserDTO, completion: @escaping (Result<Void, ErrorApi>) -> Void) {
-        guard let url = URL(string: "\(baseUrl)/\(userDTO.uuid)") else {
-            completion(.failure(.invalidURL))
-            return
+    public func getUserList() async -> [User] {
+            guard let url = URL(string: baseUrl) else {
+                print("Erreur : problème en créant l'url pour getAllUsers")
+                return []
+            }
+            
+            do {
+                let response: Data = try await withCheckedThrowingContinuation { continuation in
+                    httpService.get(
+                        url: url,
+                        success: { body, _ in continuation.resume(returning: body) },
+                        failure: { error in continuation.resume(throwing: error) }
+                    )
+                }
+                
+                let result = try JSONDecoder().decode([UserDTO].self, from: response)
+                let users = result.map({User(from: $0)})
+                return users
+            } catch {
+                print("Error while decoding list of users or fetching data: \(error)")
+                return []
+            }
         }
         
-        do {
-            let body = try JSONEncoder().encode(userDTO)
-            httpService.put(url: url, body: body, success: { _, _ in
-                completion(.success(()))
-            }, failure: { error in
-                completion(.failure(.unknownError(error)))
-            })
-        } catch {
-            completion(.failure(.decodingError))
-        }
-    }
-    
-    func deleteUser(uuid: String, completion: @escaping (Result<Void, ErrorApi>) -> Void) {
-        guard let url = URL(string: "\(baseUrl)/\(uuid)") else {
-            completion(.failure(.invalidURL))
-            return
+        public func modifyUser (_ user: User) async {
+            guard let url = URL(string: "\(baseUrl)/\(user.id)") else {
+                print("Erreur : problème en créant l'url pour getAllUsers")
+                return
+            }
+            let userDTO : UserDTO = user.toDTO()
+            let encoder = JSONEncoder()
+            do {
+                let jsonData = try encoder.encode(userDTO)
+                httpService.patch(url: url, body: jsonData, success: {_,_ in }, failure: {_ in})
+            } catch {
+                print("Error while encoding data")
+            }
         }
         
-        httpService.delete(url: url, success: { _, _ in
-            completion(.success(()))
-        }, failure: { error in
-            completion(.failure(.unknownError(error)))
-        })
-    }
+        public func deleteUser (_ user: User) async {
+            guard let url = URL(string: "\(baseUrl)/\(user.id)") else {
+                print("Erreur : problème en créant l'url pour getAllUsers")
+                return
+            }
+            httpService.delete(url: url, success: {_,_ in print("Deletion went all good")}, failure: {error in print(error)})
+        }
 }

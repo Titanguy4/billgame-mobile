@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct GameWithStockListView: View {
-    @ObservedObject private var gameViewModel: GameViewModel = GameViewModel()
+    @ObservedObject var gameViewModel: GameViewModel
+    @Binding var searchQuery: String
 
     private let columns = [
         GridItem(.flexible(), spacing: 10),
@@ -11,7 +12,7 @@ struct GameWithStockListView: View {
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 20) {
-                ForEach(gameViewModel.allGames) { game in
+                ForEach(filteredGames) { game in
                     GameWithStockItemView(game: game)
                         .frame(maxWidth: .infinity)
                         .padding(8)
@@ -24,6 +25,23 @@ struct GameWithStockListView: View {
                 }
             }
             .padding(.horizontal, 10)
+        }
+        .onAppear {
+            if gameViewModel.allGames.isEmpty {
+                Task {
+                    await gameViewModel.loadAllGames()
+                }
+            }
+        }
+    }
+
+    private var filteredGames: [GameWithStock] {
+        if searchQuery.isEmpty {
+            return gameViewModel.allGames
+        } else {
+            return gameViewModel.allGames.filter { game in
+                game.name.lowercased().hasPrefix(searchQuery.lowercased())
+            }
         }
     }
 }
