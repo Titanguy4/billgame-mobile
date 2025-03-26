@@ -3,7 +3,6 @@ import SwiftUI
 struct WithdrawGamesSheetView: View {
     @Binding var isPresented: Bool
     @ObservedObject var viewModel: StockViewModel
-    @State private var selectedGames: Set<String> = []
 
     var body: some View {
         VStack {
@@ -26,16 +25,7 @@ struct WithdrawGamesSheetView: View {
 
                     ForEach(viewModel.availableGames, id: \.etiquette) { game in
                         HStack {
-                            Toggle(isOn: Binding(
-                                get: { selectedGames.contains(game.etiquette) },
-                                set: { isSelected in
-                                    if isSelected {
-                                        selectedGames.insert(game.etiquette)
-                                    } else {
-                                        selectedGames.remove(game.etiquette)
-                                    }
-                                }
-                            )) {
+                            Toggle(isOn: bindingForGame(game)) {
                                 Text("\(game.etiquette) \(game.name)")
                                     .font(.body)
                             }
@@ -54,10 +44,10 @@ struct WithdrawGamesSheetView: View {
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(selectedGames.isEmpty ? Color.gray : Color.black)
+                    .background(viewModel.selectedGamesToWithdraw.isEmpty ? Color.gray : Color.black)
                     .cornerRadius(10)
             }
-            .disabled(selectedGames.isEmpty)
+            .disabled(viewModel.selectedGamesToWithdraw.isEmpty)
             .padding()
 
             Spacer()
@@ -68,6 +58,18 @@ struct WithdrawGamesSheetView: View {
                 isPresented = false
             }
         }
-
+    }
+    
+    private func bindingForGame(_ game: Game) -> Binding<Bool> {
+        Binding(
+            get: { viewModel.selectedGamesToWithdraw.contains(game.etiquette) },
+            set: { isSelected in
+                if isSelected {
+                    viewModel.addGameToWithdraw(game.etiquette)
+                } else {
+                    viewModel.removeGameFromWithdraw(game.etiquette)
+                }
+            }
+        )
     }
 }

@@ -70,7 +70,7 @@ struct LoginView: View {
                 if viewModel.isAuthenticated {
                     if viewModel.isAdmin {
                         navigateToAdmin = true
-                    } else if viewModel.isMerchant {
+                    } else if viewModel.isManager {
                         navigateToManager = true
                     }
                 }

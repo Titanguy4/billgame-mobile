@@ -41,7 +41,7 @@ struct HomeSessionView: View {
                                         .background(Color.black)
                                         .cornerRadius(25)
                                 }
-                            } else if viewModel.isMerchant {
+                            } else if viewModel.isManager {
                                 NavigationLink(destination: ManagerView()) {
                                     Text("Dashboard Vendeur")
                                         .font(.system(size: 14))

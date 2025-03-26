@@ -29,6 +29,16 @@ class StockViewModel: ObservableObject {
             isEmailVerified = false
         }
     }
+    
+    func removeGameFromWithdraw(_ etiquette: String) {
+        self.selectedGamesToWithdraw.removeAll{$0 == etiquette}
+    }
+    
+    func addGameToWithdraw(_ etiquette: String){
+        if !selectedGamesToWithdraw.contains(etiquette){
+            selectedGamesToWithdraw.append(etiquette)
+        }
+    }
 
     func checkMerchantEmail() {
         userService.getMerchantUUIDByEmail(email: email) { result in
@@ -142,6 +152,8 @@ class StockViewModel: ObservableObject {
             print("UUID du marchand introuvable")
             return
         }
+        
+        print(selectedGamesToWithdraw)
         
         let withdrawDTO = WithdrawGamesDTO(ownerUuid: uuid, labels: selectedGamesToWithdraw)
 

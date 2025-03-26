@@ -91,8 +91,9 @@ class StockService {
         }
 
         do {
+            print(listOfGamesToWithdraw)
             let body = try JSONEncoder().encode(listOfGamesToWithdraw)
-            httpService.post(url: url, body: body, success: { _, _ in
+            httpService.post(url: url, body: body, success: { response, _ in
                 completion(.success(()))
             }, failure: { error in
                 completion(.failure(.unknownError(error)))

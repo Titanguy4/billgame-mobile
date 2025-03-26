@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AD94227F2D8860450010E8D4 /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = AD94227E2D8860450010E8D4 /* JWTDecode */; };
+		ADF002D92D936D2300F12A2A /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = ADF002D82D936D2300F12A2A /* JWTDecode */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD94227F2D8860450010E8D4 /* JWTDecode in Frameworks */,
+				ADF002D92D936D2300F12A2A /* JWTDecode in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +70,7 @@
 			);
 			name = "billgame-mobile";
 			packageProductDependencies = (
-				AD94227E2D8860450010E8D4 /* JWTDecode */,
+				ADF002D82D936D2300F12A2A /* JWTDecode */,
 			);
 			productName = "billgame-mobile";
 			productReference = AD1B8DE22D816AEE009B0845 /* billgame-mobile.app */;
@@ -101,7 +101,7 @@
 			mainGroup = AD1B8DD92D816AEE009B0845;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				AD94227D2D8860450010E8D4 /* XCRemoteSwiftPackageReference "JWTDecode" */,
+				ADF002D72D936D2300F12A2A /* XCRemoteSwiftPackageReference "JWTDecode" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AD1B8DE32D816AEE009B0845 /* Products */;
@@ -333,7 +333,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		AD94227D2D8860450010E8D4 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
+		ADF002D72D936D2300F12A2A /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
 			requirement = {
@@ -344,9 +344,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		AD94227E2D8860450010E8D4 /* JWTDecode */ = {
+		ADF002D82D936D2300F12A2A /* JWTDecode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AD94227D2D8860450010E8D4 /* XCRemoteSwiftPackageReference "JWTDecode" */;
+			package = ADF002D72D936D2300F12A2A /* XCRemoteSwiftPackageReference "JWTDecode" */;
 			productName = JWTDecode;
 		};
 /* End XCSwiftPackageProductDependency section */

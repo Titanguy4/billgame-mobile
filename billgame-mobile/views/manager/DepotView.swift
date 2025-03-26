@@ -32,18 +32,15 @@ struct DepotView: View {
                         .font(.footnote)
                         .padding(.horizontal)
                 }
-
-                // Remplacer l'ancienne méthode de NavigationLink
-                NavigationLink(value: navigateToDepot) {
+                
+                NavigationLink(
+                    destination: DepotFormView(viewModel: depotViewModel),
+                    isActive: $navigateToDepot
+                ) {
                     EmptyView()
                 }
-                .navigationDestination(for: Bool.self) { isActive in
-                    if isActive {
-                        DepotFormView(viewModel: depotViewModel)
-                    }
-                }
-                .onChange(of: depotViewModel.isEmailVerified) { isVerified in
-                    if isVerified {
+                .onChange(of: depotViewModel.isEmailVerified, initial: false) {
+                    if depotViewModel.isEmailVerified {
                         navigateToDepot = true
                     }
                 }
