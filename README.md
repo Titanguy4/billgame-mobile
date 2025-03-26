@@ -17,9 +17,9 @@ Avant de lancer le projet, assurez-vous d'installer les modules nécessaires.
 ### Identifiants pour la connexion
 
 - admin
-alice.dupont@example.com
-hashed_password_alice
+email: alice.dupont@example.com
+password: hashed_password_alice
 
 - manager
-diane.dubois@example.com
-hashed_password_diane
+email: diane.dubois@example.com
+password: hashed_password_diane
